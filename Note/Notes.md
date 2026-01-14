@@ -88,6 +88,28 @@
     
 - **TCP**
 
+     - **Header**
+
+        ```
+        0                   1                   2                   3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        |          Source Port          |       Destination Port        | ← Identifies sockets
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        |                        Sequence Number (32)                   | ← Byte-based sequencing
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        |                    Acknowledgment Number (32)                 | ← Next expected byte
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        |  Data Offset  |  0  |  Flags  |       Window Size (16)        | ← Control & flow control
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        |     Checksum (16)             |       Urgent Pointer (16)     | ← Integrity & urgent data
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        |                         Options (variable)                    |
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        |                           Data                                |
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        ```
+
     - **Connection Establishment (Setup)**
 
         - **Three-Way Handshake**
@@ -115,6 +137,38 @@
             - Both parties run instances of this state machine, and TCP allows for simultaneous open.
 
     - **Sliding Windows/Flow Control**
+
+        - **Automatic Repeat Query**
+            
+            ARQ with one message at a time is **Stop-and-Wait**. It allows only a single message to be outstanding from sender.
+
+        - **Sliding Window**
+
+           It allows $W$ outstanding packets, enabling pipelining to send multiple packets per RTT for improved performance.
+
+           Sender buffers up to $W$ segments until they are acknowledged. The last frame sent minus last ack rec'd should no more than $W$.
+
+           <img src="pic/5.png" width="60%" height="60%">
+
+            - **Go-Back-N**
+
+                Only buffers next expected packet (LAS). Accepts only sequential packets, discards others, sends **cumulative** ACK.
+
+            - **Selective Repeat**
+
+                Buffers entire window. Stores out-of-order packets, sends individual ACKs, retransmits only lost packets.
+            
+            - **Sequence Number**
+
+                $n$ bit counter wraps around at $2^n - 1$. Let $LAR$ be Last Acknowledgement Received, $LAS$ be Last Acknowledgement Sent.
+                |Method|Sender's Range|Receiver's Range|Min Number Needed to Avoid Overlap|
+                |:--:|:--:|:--:|:--:|
+                |Go-Back-N|$[LAR + 1,LAR + W]$|$LAS + 1$|$W + 1$|
+                |Selective Repeat|$[LAR + 1,LAR + W]$|$[LAS + 1,LAS + W]$|$2W$|
+        
+        - **ACK Clocking**
+
+            ACK clocking is a feedback mechanism where the network itself determines the sending pace, preventing queue buildup and ensuring efficient, low-latency data flow.
 
     - **Connection Release (Teardown)**
 
