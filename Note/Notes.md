@@ -160,15 +160,31 @@
             
             - **Sequence Number**
 
-                $n$ bit counter wraps around at $2^n - 1$. Let $LAR$ be Last Acknowledgement Received, $LAS$ be Last Acknowledgement Sent.
+                $n$ bit counter wraps around at $2^n - 1$. Let $\text{LAR}$ be Last Acknowledgement Received, $\text{LAS}$ be Last Acknowledgement Sent.
                 |Method|Sender's Range|Receiver's Range|Min Number Needed to Avoid Overlap|
                 |:--:|:--:|:--:|:--:|
-                |Go-Back-N|$[LAR + 1,LAR + W]$|$LAS + 1$|$W + 1$|
-                |Selective Repeat|$[LAR + 1,LAR + W]$|$[LAS + 1,LAS + W]$|$2W$|
+                |Go-Back-N|$[\text{LAR} + 1,\text{LAR} + W]$|$\text{LAS} + 1$|$W + 1$|
+                |Selective Repeat|$[\text{LAR} + 1,\text{LAR} + W]$|$[\text{LAS} + 1,\text{LAS} + W]$|$2W$|
         
-        - **ACK Clocking**
+        - **Pacing**
 
-            ACK clocking is a feedback mechanism where the network itself determines the sending pace, preventing queue buildup and ensuring efficient, low-latency data flow.
+            - **ACK Clocking** (sender)
+
+                ACK clocking is a feedback mechanism where the network itself determines the sending pace, preventing queue buildup and ensuring efficient, low-latency data flow.
+
+            - **Flow Control** (Receiver)
+
+                Flow control uses the `WIN` field, calculated as `WIN = ReceiveBuffer - (LastByteRcvd - LastByteRead)`, to dynamically limit the sender's window, preventing receiver buffer overflow.
+
+            $\text{SEQ} + \text{length} < \text{ACK} + \text{WIN}$
+        
+            - **Adaptive Timeout**
+
+                |Name|Formula|
+                |:--:|:--:|
+                |$\text{SRTT}$ (average round‑trip time)|$\text{SRTT}_{n + 1} = (1 - \alpha)\cdot \text{SRTT}_n + \alpha \cdot \text{RTT}_{n + 1}$ |
+                |$\text{Svar}$ (variability of RTT)|$\text{Svar}_{n + 1} = (1-\beta)\cdot \text{Svar}_n + \beta \cdot \mid \text{RTT}_{n + 1} - \text{SRTT}_{n + 1} \mid$|
+                |$\text{Timeout}$|$\text{Timeout}_n = \text{SRTT}_n + 4 \cdot \text{Svar}_n$|
 
     - **Connection Release (Teardown)**
 
