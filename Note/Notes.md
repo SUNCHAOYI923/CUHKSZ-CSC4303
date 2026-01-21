@@ -4,8 +4,6 @@
 
 - https://book.systemsapproach.org/foundation.html
 
-## Transport Layer
-
 ### Network Model
 
 |Layer|Description|Example|
@@ -16,99 +14,83 @@
 |Link|Send frames over one or more links|Ethernet, 802.11|
 |Physical|Send bits using signals|wires, fiber, wireless|
 
-#### Transport Layer
+### Transport Layer
 
-- **Socket** 
+#### UDP
+
+- **Connectionless** 
     
-    An endpoint for network communication that allows an application to attach to a specific port on the local network interface, enabling data exchange with other applications across the network.
+    Each packet is independent.
 
-- **Port**
+    ```
+    Sender    Time       Receiver
+      |                     |
+      |----- Packet1 -----> |
+      |                     |
+      |----- Packet2 -----> |
+      |                     |
+    ```
 
-    A port is a 16-bit number appended to an IP address that identifies a specific application or service on a single computer.
+- **Buffering**
+
+    UDP buffering is a "temporary storage area" maintained by the operating system for each UDP port, where arriving packets queue up when applications can't process them immediately.
+
+    ```
+    Application A  Application B   Application C
+        ↓               ↓               ↓
+    [Port X]        [Port Y]        [Port Z]      ← Port mapping
+        ↓               ↓               ↓
+    [Queue 1]       [Queue 2]       [Queue 3]     ← Independent UDP message queues
+        │               │               │
+        └───────┬───────┴───────┬───────┘
+                ↓               ↓
+        [Port Multiplexer/Demultiplexer]          ← Routes by port number
+                ↓
+        [Incoming UDP packets]
+    ```
+
+- **Header**
+
+    Note that the Datagram length up to 64K.
+    ```
+         32-bit width (4 bytes per row)
+    0                  16                31
+    ┌──────────────────┬──────────────────┐
+    │ Source Port      │ Destination Port │ ← Port addressing
+    │   (16 bits)      │   (16 bits)      │
+    ├──────────────────┴──────────────────┤
+    │    Length        │    Checksum      │ ← Size & integrity
+    │    (16 bits)     │    (16 bits)     │
+    ├─────────────────────────────────────┤
+    │                                     │
+    │           Application Data          │
+    │                                     │
+    └─────────────────────────────────────┘
+    ```
     
-|Feature|TCP|UDP|
-|:--:|:--:|:--:|
-|Mode|Connections|Datagrams|
-|Reliability|No loss, no duplicates, in-order delivery|May lose, reorder, or duplicate packets|
-|Data Size|Unlimited|Limited|
-|Flow Control|Flow control matches sender to receiver|Send regardless of receiver state|
-|Congestion Control|Congestion control matches sender to network|Send regardless of network state|
+#### TCP
 
-- **UDP**
+- **Header**
 
-    - **Connectionless** 
-        
-        Each packet is independent.
-
-        ```
-        Sender    Time       Receiver
-          |                     |
-          |----- Packet1 -----> |
-          |                     |
-          |----- Packet2 -----> |
-          |                     |
-        ```
-
-    - **Buffering**
-
-        UDP buffering is a "temporary storage area" maintained by the operating system for each UDP port, where arriving packets queue up when applications can't process them immediately.
-
-        ```
-        Application A  Application B   Application C
-            ↓               ↓               ↓
-        [Port X]        [Port Y]        [Port Z]      ← Port mapping
-            ↓               ↓               ↓
-        [Queue 1]       [Queue 2]       [Queue 3]     ← Independent UDP message queues
-            │               │               │
-            └───────┬───────┴───────┬───────┘
-                    ↓               ↓
-            [Port Multiplexer/Demultiplexer]          ← Routes by port number
-                    ↓
-            [Incoming UDP packets]
-        ```
-
-    - **Header**
-
-        Note that the Datagram length up to 64K.
-        ```
-             32-bit width (4 bytes per row)
-        0                  16                31
-        ┌──────────────────┬──────────────────┐
-        │ Source Port      │ Destination Port │ ← Port addressing
-        │   (16 bits)      │   (16 bits)      │
-        ├──────────────────┴──────────────────┤
-        │    Length        │    Checksum      │ ← Size & integrity
-        │    (16 bits)     │    (16 bits)     │
-        ├─────────────────────────────────────┤
-        │                                     │
-        │           Application Data          │
-        │                                     │
-        └─────────────────────────────────────┘
-        ```
-    
-- **TCP**
-
-     - **Header**
-
-        ```
-        0                   1                   2                   3
-        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        |          Source Port          |       Destination Port        | ← Identifies sockets
-        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        |                        Sequence Number (32)                   | ← Byte-based sequencing
-        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        |                    Acknowledgment Number (32)                 | ← Next expected byte
-        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        |  Data Offset  |  0  |  Flags  |       Window Size (16)        | ← Control & flow control
-        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        |     Checksum (16)             |       Urgent Pointer (16)     | ← Integrity & urgent data
-        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        |                         Options (variable)                    |
-        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        |                           Data                                |
-        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        ```
+    ```
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |          Source Port          |       Destination Port        | ← Identifies sockets
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                        Sequence Number (32)                   | ← Byte-based sequencing
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                    Acknowledgment Number (32)                 | ← Next expected byte
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |  Data Offset  |  0  |  Flags  |       Window Size (16)        | ← Control & flow control
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |     Checksum (16)             |       Urgent Pointer (16)     | ← Integrity & urgent data
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                         Options (variable)                    |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                           Data                                |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    ```
 
     - **Connection Establishment (Setup)**
 
@@ -267,4 +249,118 @@
             - **Fast Recovery (TCP Reno)**
 
                 Fast recovery keeps data flowing during retransmission by maintaining the ACK clock. It avoids resetting to Slow Start after packet loss. Set $\text{ssthresh} = \frac{\text{cwnd}}{2}$ and then continue AI directly.
+
+#### UDP & TCP
+
+|Feature|TCP|UDP|
+|:--:|:--:|:--:|
+|Mode|Connections|Datagrams|
+|Reliability|No loss, no duplicates, in-order delivery|May lose, reorder, or duplicate packets|
+|Data Size|Unlimited|Limited|
+|Flow Control|Flow control matches sender to receiver|Send regardless of receiver state|
+|Congestion Control|Congestion control matches sender to network|Send regardless of network state|
         
+#### Socket
+    
+An endpoint for network communication that allows an application to attach to a specific port on the local network interface, enabling data exchange with other applications across the network.
+
+<img src="pic/6.png" width="60%" height="60%">
+
+- **Process**
+
+    Cilent `socket () ------------------------> connect () -> I/O -> close ()`
+
+    Server `socket () -> bind () -> listen () -> accept () -> I/O -> close ()`
+
+    1. The server blocks in `accept()` on `listenfd` for incoming connections. 
+
+    2. The client calls `connect()` to initiate the TCP handshake, which also blocks. 
+
+    3. Upon completion, the server's `accept()` returns a `connfd` and the client's `connect()` returns, establishing a bidirectional channel between `clientfd` and `connfd`.
+
+- **Create** `int socket (int domain, int type, int protocol);` 
+    
+    - **domain** AF_INET IPv4 / AF_INET6 IPv6.
+
+    - **type** SOCK_STREAM TCP / SOCK_DGRAM UDP.
+
+    - **protocol** 0 (automatically select the default protocol).
+
+- **Bind** `int bind (int sockfd, sockaddr *addr, socklen_t addrlen);`
+    
+    When a **server** binds a socket to a specific address, it establishes that data arriving at that address is read from this socket, and data written to this socket is sent from that address.
+
+    - **socket address**
+
+        ```c
+        struct sockaddr
+        {
+            uint_16 ss_family; // protocol family
+            char ss_data[14]; // address data
+        }
+        ```
+
+    - **sockaddr_in**
+
+        ```c
+        struct sockaddr_in
+        {
+            uint16_t sin_family; // always AF_INET
+            uint16_t sin_port; // in network byte order
+            struct in_addr sin_addr; // in network byte order
+            unsigned char sin_zero[8]; // pad to sizeof (struct sockaddr), placeholder
+        }
+        ```
+
+        Network data is transmitted in big-endian byte order. Use `htons()` and `htonl()` to convert host-ordered values into network-ordered short and long integers, respectively.
+    
+- **Listen** `int listen (int sockfd, int backlog);`
+
+    `listen ()` transforms a socket descriptor into a listening socket capable of accepting client connections. The `backlog` parameter suggests how many pending connections the kernel may queue before refusing new requests (typically around 128).
+
+- **Accept** `int accpet (int listenfd, sockaddr *addr, int *addrlen);`
+    
+    `accept()` blocks until a client connects via `listenfd`, stores the client's address in `addr`, and returns a `connfd` for communication using standard Unix I/O functions.
+
+- **Connect** `int connect (int clientfd, sockaddr *addr, socklen_t addrlen);`
+
+    Attempts to establish a connection with server at socket address `addr`.
+
+    To convert a string-formatted IP address (e.g., `SERVER_IP`), use `inet_pton (int af, const char *src, void *dst)` to transform it into binary network format.
+
+    |Feature|`listenfd`|`connfd`|
+    |:--:|:--:|:--:|
+    |**Purpose**|Accepts connection requests|Handles data exchange with a client|
+    |**Creation**|Once at server start|Per accepted connection|
+    |**Lifetime**|Entire server runtime|Duration of client service|
+    |**Quantity**|One per port|One per active client|
+    |**Concurrent Use**|Listens for all clients|Dedicated to single client|
+
+- **Send and Receive**
+
+    `ssize_t read (int fd, void *buf, size_t len);` returns the number of bytes actually read (0 indicates the connection is closed, -1 indicates an error).
+
+    `ssize_t write (int fa, const void *buf, size_t len);` returns the number of bytes actually written (-1 indicates an error).
+
+- **Close** `int close (int sockfd)`
+
+- **Concurrency**
+
+    - **Threading/Process** Race conditions increase complexity!
+    
+    - **I/O Multiplexing** 
+        
+        - `select()`
+
+        - `poll()` 
+            
+            `poll()` is a system call used to monitor multiple file descriptors concurrently for I/O readiness. Unlike `select()`, it imposes **no fixed limit** on the number of file descriptors that can be monitored.
+
+            ```c
+            struct pollfd
+            {
+                int fd; // file descriptor
+                short events; // requested events
+                short revents; // returned events
+            }   
+            ```
