@@ -4,7 +4,7 @@
 
 - https://book.systemsapproach.org/foundation.html
 
-### Network Model
+## Network Model
 
 |Layer|Description|Example|
 |:--:|:--:|:--:|
@@ -364,3 +364,52 @@ An endpoint for network communication that allows an application to attach to a 
                 short revents; // returned events
             }   
             ```
+
+### Network Layer
+
+####  Internet Protocol (IP)
+
+- **IPV4 Header**
+
+```
+0                   1                   2                   3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|Version| IHL   |Type of Service|        Total Length (16)      | ← Basic identification (IHL : Header)
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|        Identification (16)    |Flags|   Fragment Offset (13)  | ← Fragmentation control
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Time to Live |    Protocol   |        Header Checksum (16)   | ← Routing & integrity (Time to Live : TTL)
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                       Source Address (32)                     | ← Sender IP
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Destination Address (32)                   | ← Receiver IP
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Options (if any, variable)                 | ← Optional features
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                           Payload (Data)                      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+```
+
+- **IP Addresses** An IP address is assigned to each network interface. Consequently, routers possess multiple interfaces, while most hosts have just one or two (wired and wireless).
+
+- **IP Prefixes** In a prefix of length L, the top L bits are identical across all addresses. In CIDR notation, such a prefix is denoted as `IP address/prefix length` (e.g. `128.13.0.0/16` is `128.13.0.0` to `128.13.255.255`.)
+
+- **IP Forwarding** It uses longest prefix matching to select the most specific route.
+
+- **IP fragmentation**
+
+    - **MTU** Max Transfer Size
+    - **MSS** Maximum Segment Size
+    
+    <img src="pic/7.png" width="50%" height="50%">
+
+    Each fragment is encapsulated with its own IP header.
+
+    | Field | Size (bits) | Purpose |
+    |:--:|:--:|:--:|
+    | **Identification** | 16 | Unique identifier for the original datagram; **all fragments** of the same datagram share this value. |
+    | **Flags** | 3 | Control bits for fragmentation<br>**DF (Don't Fragment)** If set 1, routers must not fragment the packet.<br>**MF (More Fragments)** If set 1, more fragments follow, otherwise indicates that it is the last fragment. |
+    | **Fragment Offset** | 13 | Indicates the position of this fragment's data **in 8‑byte units** relative to the start of the original datagram. |
+
+#### Dynamic Host Configuration Protocol (DHCP) [Application Layer]
