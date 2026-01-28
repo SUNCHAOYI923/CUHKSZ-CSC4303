@@ -413,3 +413,47 @@ An endpoint for network communication that allows an application to attach to a 
     | **Fragment Offset** | 13 | Indicates the position of this fragment's data **in 8‑byte units** relative to the start of the original datagram. |
 
 #### Dynamic Host Configuration Protocol (DHCP) [Application Layer]
+
+| Step | Message | IP Header (Src &rarr; Dst) | Ethernet (Src &rarr; Dst) | Purpose |
+|:----:|:--------|:-------------------------------------------|:--------------------------------------------------------|:---------------------------------------|
+| 1 | **DISCOVER** | `0.0.0.0` &rarr; `255.255.255.255` | `Client MAC` &rarr; `FF:FF:FF:FF:FF:FF` | Client broadcasts to find DHCP servers |
+| 2 | **OFFER** | `Server's IP` &rarr; `255.255.255.255` | `Server MAC` &rarr; `FF:FF:FF:FF:FF:FF` | Server proposes IP configuration |
+| 3 | **REQUEST** | `0.0.0.0` &rarr; `255.255.255.255` | `Client MAC` &rarr; `FF:FF:FF:FF:FF:FF` | Client accepts the offer |
+| 4 | **ACK** | `Server's IP` &rarr; `255.255.255.255` | `Server MAC` &rarr; `FF:FF:FF:FF:FF:FF` | Server confirms and finalizes lease |
+
+#### Address Resolution Protocol (ARP)
+
+Every network device possesses a unique MAC (Media Access Control) address, which operates at the link layer.
+
+ARP resolves IP to MAC addresses locally. A node **broadcasts** an ARP request, receives a **private** reply, and **caches** the mapping in its ARP table.
+
+#### Internet Control Message Protocol (ICMP)
+
+When an error occurs, an ICMP error report is sent back to the source IP address and the problematic packet is discarded. The source host must then rectify the issue.
+
+- **Message Format**
+
+    - **IP Header** `Src = router, Dst = A, Protocol = 1`
+
+    - **ICMP Header** `Type = X, Code = Y`
+
+    - **ICMP Data** `Src = A, Dst = B, ...`
+  
+- **Type**
+
+|Name|Code|Usage|
+|:--:|:--:|:--:|
+|Dest. Unreachable (Net or Host)|`3/0` or `3/1`|Lack of connectivity|
+|Dest. Unreachable (Fragment)|`3/4`|Path MTU Discovery|
+|Time Exceeded (Transit) |`11/0`|Traceroute ($\texttt{TTL} = 0$)|
+|Echo Request or Reply|`8/0` or `0/0`|Ping|
+
+- **Traceroute**
+
+Traceroute sends probe packets with incrementing TTL. Each router that decrements TTL to zero replies with an ICMP Time Exceeded error, revealing its address.
+
+#### Network Address Translation (NAT)
+
+NAT maps multiple private IP:port pairs to a single public IP with unique external ports via a stateful translation table, enabling many internal devices to share one external address.
+
+#### Routing and Forwarding
