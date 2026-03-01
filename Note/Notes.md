@@ -457,3 +457,27 @@ Traceroute sends probe packets with incrementing TTL. Each router that decrement
 NAT maps multiple private IP:port pairs to a single public IP with unique external ports via a stateful translation table, enabling many internal devices to share one external address.
 
 #### Routing and Forwarding
+
+- **Fully Distributed Routing**
+  
+    - **No central controller** All routers are equal and make independent decisions.  
+    - **Local knowledge only** Routers learn about the network by exchanging messages with directly connected neighbors.
+    - **Concurrent operation**
+    - **Failure tolerance** There may be node/link/message failures.
+
+- **Hierarchical Routing**
+
+    Introduce a larger routing unit. Route first to the region, then to the IP prefix within the region.
+
+    - **Routing Table**
+
+        - **Static Routing**
+        - **Dynamic Routing** RIP (Routing Information Protocol), OSPF (Open Shortest Path First), BGP (Border Gateway Protocol).
+
+    - **IP Prefix Aggregation and Subnets**
+
+        Routers can change prefix lengths without affecting hosts.
+
+        - **Subnetting** Split large prefix into smaller ones internally.
+        - **Aggregation** Join small prefixes into one large prefix externally.
+    
