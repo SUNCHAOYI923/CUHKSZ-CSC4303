@@ -367,7 +367,7 @@ An endpoint for network communication that allows an application to attach to a 
 
 ### Network Layer
 
-####  Internet Protocol (IP)
+#### Internet Protocol (IP)
 
 - **IPV4 Header**
 
@@ -481,3 +481,88 @@ NAT maps multiple private IP:port pairs to a single public IP with unique extern
         - **Subnetting** Split large prefix into smaller ones internally.
         - **Aggregation** Join small prefixes into one large prefix externally.
     
+#### Routing
+
+- **Sink Tree** 
+
+    Sink tree for a destination is the union of all shortest paths towards the destination. Each node only stores next hop (parent) towards root.
+
+- **Distance Vector Routing**
+
+    Each node shares distance vectors with neighbors, updates paths using shortest heard distance, and forwards via best next hop.
+
+    Slow convergence, count-to-infinity, and routing loops occur because nodes only know neighbor info, not full topology, causing outdated routes to propagate and persist.
+
+    - **RIP (Routing Information Protocol)**
+
+- **Link-State Routing**
+
+    - **Flooding**
+        - Send an incoming message on to all other neigbors.
+        - Remember the message so that it is only flooded once.
+    - **Dijkstra**
+
+### Application Layer 
+
+#### Peer to Peer
+
+Leverage peer resources: computation, storage, bandwidth. Also emerging: mobility, coins (tokens), sensors. Decentralized, scalable architecture.
+
+Storage networks replicate files anywhere, making search difficult, especially with node churn.
+
+- **Framework**  
+
+    - **Join** How to start participating
+    - **Publish** How to advertise files
+    - **Search** How to find files
+    - **Fetch** How to retrieve files
+
+- **Napster**
+
+    Server does all porcessing & Server maintains $O(N)$ state & Single point of failure
+    
+    - **Join** Client contacts central server on startup
+    - **Publish** Reports list of files to central server
+    - **Search** Query server → returns peer storing requested file
+    - **Fetch** Get file directly from peer
+
+- **Gnutella**
+
+    Complete decentralization & Query flooding
+
+    Search scope is $O(N)$ & Unpredictable search time & No guarantee of finding files (TTL-limited search only works well for haystacks)
+
+    - **Join** Client contacts a few existing nodes on startup → these become its "neighbors"
+    - **Publish** No need (no central index)
+    - **Search** Ask neighbors → neighbors ask their neighbors → when/if found, reply back along the path; TTL limits propagation
+    - **Fetch** Get file directly from peer
+
+- **Gnutella/KaZaA [Two-level hierarchy]**
+
+    Kept a centralized registration
+
+    Supernodes have better connection to Internet and act as temporary indexing servers for other nodes to help improve the stability fo the network.
+
+    Standard nodes connect to supernodes and report list od files.
+
+| Dimension | Napster | Gnutella | Gnutella/KaZaA (Two-Layer) |
+|-----------|-------------|---------------------|--------------------------------|
+| **Index** | Central server | No index | Supernodes maintain index (temporary central) |
+| **Search** | Query central server | Flooding (ask neighbors) | Flooding between supernodes |
+| **Transfer** | Direct peer-to-peer | Direct peer-to-peer | Direct peer-to-peer |
+| **Join** | Contact central server | Find a few neighbors | Find and connect to a supernode |
+
+- **BitTorrent**
+
+    Central tracker server needed to bootstrap swarm.
+
+    - **File swarming** Files split into chunks; download from multiple peers, upload to others simultaneously.
+    - **Tracker** Central server coordinates peers (joins, maintains lists), but doesn't store files.
+    - **Tit-for-tat** Upload to the fastest $N$ peers you download from. Encourages fairness, discourages freeloading.
+    - **Optimistic unchoke** Randomly let new peers download to prevents starvation, discovers better partners.
+    - **Rarest first** Prioritize distributing scarce chunks to improve file availability and resilience.
+    - **Out-of-band search** Find files via Google/torrent sites. Scalable, no single point of failure.
+  
+- **DHT (Distributed Hash Table)**
+    
+    Decentralized system using consistent hashing: keys and nodes hashed onto a ring (Chord). Each key stored on its successor node. Finger tables enable $O(\log N)$ lookup (Entry $i$ which starts from $1$ points to the first node on the ring that is $\ge x + 2^{i - 1}$), improving from naive $O(N)$.
