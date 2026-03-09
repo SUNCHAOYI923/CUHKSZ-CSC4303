@@ -566,3 +566,64 @@ Storage networks replicate files anywhere, making search difficult, especially w
 - **DHT (Distributed Hash Table)**
     
     Decentralized system using consistent hashing: keys and nodes hashed onto a ring (Chord). Each key stored on its successor node. Finger tables enable $O(\log N)$ lookup (Entry $i$ which starts from $1$ points to the first node on the ring that is $\ge x + 2^{i - 1}$), improving from naive $O(N)$.
+
+#### Amazon Dynamo
+
+- **Architecture**
+
+    <img src="pic/8.png" width="60%" height="60%">
+
+- **Partition**
+  
+    - **Hash partitioning** `partition = hash(key) % partition_count`
+    - **Consistent hashing** (better) 
+    - **Virtual nodes (vnodes)** Virtual nodes assign multiple ring positions to each physical node, distributing data migration and improving load balancing across all nodes.
+    - **Heterogeneity** More powerful nodes can have more capacity, thus more vnodes.
+    - **Replication** Dynamo skips nodes to ensure replicas reside on different nodes (set Replication Factor, i.e. $RF$).
+    - **Dynamo Reads/Writes** $R/W$ is configurable. When $R + W > RF**, the  read and written will overlap, with last write wins (LWW) resolving conflicts.
+    - **Dynamo API**
+
+        -  `get (k)` returns value(s) and context. It returns multiple versions if conflicts exist. The context contains Timestamps to track version history.
+        - `put (k,context,value)` uses the provided context to indicate which previous version(s) this new version supersedes or merges.
+
+#### HyperText Transfer Protocol (HTTP)
+
+- **Request**
+
+|Method|Description|
+|:--:|:--:|
+|$\text{GET}$|Read a Web page|
+|$\text{HEAD}$|Read a Web page's header|
+|$\text{POST}$|Append to a Web page|
+|$\text{PUT}$|Store a Web page|
+|$\text{DELETE}$|Remove the Web page|
+|$\text{TRACE}$|Echo the incoming request|
+|$\text{CONNECT}$|Connect through a proxy|
+|$\text{OPTIONS}$|Query options for a page|
+
+- **Response**
+
+|Meaning|Example|
+|:--:|:--:|
+| **Information** | $\texttt{100}$ Server agrees to handle client's request <br> $\texttt{101}$ Switching protocols |
+| **Success**     | $\texttt{200}$ Request succeeded <br> $\texttt{201}$ New resource created <br> $\texttt{204}$ No content present |
+| **Redirection** | $\texttt{301}$ Page moved permanently <br> $\texttt{302}$ Temporary redirect <br> $\texttt{304}$ Cached page still valid |
+| **Client error**| $\texttt{400}$ Bad request <br> $\texttt{401}$ Authentication required <br> $\texttt{403}$ Forbidden page <br> $\texttt{404}$ Page not found <br> $\texttt{429}$ Too many requests |
+| **Server error**| $\texttt{500}$ Internal server error <br> $\texttt{502}$ Bad gateway <br> $\texttt{503}$ Service unavailable, try again later <br> $\texttt{504}$ Gateway timeout |
+
+- **Page Load Time (PLT)** 
+    
+    PLT measures web performance from click to page visible, influenced by page structure, HTTP/TCP protocols, and network RTT/bandwidth.
+
+    HTTP/1.0 used one TCP connection per web resource.
+    
+    - **Parallel Connections** Browser runs multiple parallel HTTP instances, pulls in completion time of last fetch.
+
+    - **Persistent Connections** Parallel connections compete with each other for network resources. Make one TCP connection to one server and use it multiple HTTP requests.
+
+- **Web Caching and Proxies**
+
+    - **Cached Content**
+
+        - **Locally** expiry information (expires header) & heuristics (cacheable, fresh, not modified recently) [Content is then available right away]
+        - **Server** Last-Modified header & ETag” header [Content is available after 1 RTT (if connection open)]
