@@ -580,7 +580,7 @@ Storage networks replicate files anywhere, making search difficult, especially w
     - **Virtual nodes (vnodes)** Virtual nodes assign multiple ring positions to each physical node, distributing data migration and improving load balancing across all nodes.
     - **Heterogeneity** More powerful nodes can have more capacity, thus more vnodes.
     - **Replication** Dynamo skips nodes to ensure replicas reside on different nodes (set Replication Factor, i.e. $RF$).
-    - **Dynamo Reads/Writes** $R/W$ is configurable. When $R + W > RF**, the  read and written will overlap, with last write wins (LWW) resolving conflicts.
+    - **Dynamo Reads/Writes** $R/W$ is configurable. When $R + W > RF$, the  read and written will overlap, with last write wins (LWW) resolving conflicts.
     - **Dynamo API**
 
         -  `get (k)` returns value(s) and context. It returns multiple versions if conflicts exist. The context contains Timestamps to track version history.
@@ -627,3 +627,35 @@ Storage networks replicate files anywhere, making search difficult, especially w
 
         - **Locally** expiry information (expires header) & heuristics (cacheable, fresh, not modified recently) [Content is then available right away]
         - **Server** Last-Modified header & ETag” header [Content is available after 1 RTT (if connection open)]
+
+    - **Web Proxies** Place intermediary between clients and server.
+
+#### Domain Name System (DNS)
+
+DNS is a naming service to map between host names and their IP addresses (Distributed directory based on a hierarchical namespace and automated protocol to tie pieces together).
+
+<img src="pic/9.png" width="80%" height="60%">
+
+- **Top-Level Domains (TLDS)**
+
+- **DNS Resolution** Start with the root nameserver and work down zones.
+
+- **Local Nameservers and Root Nameservers** 
+    
+    Local nameservers handle client queries and recursion, while root nameservers direct them to the appropriate top-level domain servers.
+
+    Root (dot) is served by 13 **server names** (`a.root-servers.net` to `m.root-servers.net`)
+
+- **Caching** Cached data periodically times out (set appropriate TTL).
+
+- **DNS Security Extensions (DNSSEC)**
+    
+    To spoof, Trudy returns a fake DNS response that appears to be true.
+
+    - RRSIG for digital signatures of records
+    - DNSKEY for public keys for validation
+    - DS for public keys for delegation
+
+#### Content Delivery Networks (CDNs)
+
+A CDN uses DNS to direct each client to the nearest replica server based on their IP address.
