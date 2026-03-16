@@ -659,3 +659,21 @@ DNS is a naming service to map between host names and their IP addresses (Distri
 #### Content Delivery Networks (CDNs)
 
 A CDN uses DNS to direct each client to the nearest replica server based on their IP address.
+
+#### Remote Prcedure Call (RPC)
+
+- **Interface description languague** Mechanism to pass procedur parameters and return values in a machine-independent way (use IDL compier, marshal and unmarshal).
+
+- **At-Least-Once Scheme** Upon timeout, the client stub retransmits the request. After several failed attempts, it returns an error.
+
+- **At-Most-Once Scheme** 
+    
+    Since identical calls may come from different clients, duplicate detection requires a unique xid per request.
+    
+    The client includes "seen all replies $\le x$" with every RPC, allowing the server to discard outdated xids and prevent unbounded state growth.
+    
+    A pending flag per executing RPC avoids re-running duplicates.
+    
+    To survive crashes, both client and server persist pending/completed RPCs to disk.
+
+- **Exactly-Once** retransmission (At-Least-Once) + deduplication (At-Most-Once) + persistence on both sides for crash recovery. Limitation: not possible with external physical actions.
