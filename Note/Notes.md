@@ -677,3 +677,82 @@ A CDN uses DNS to direct each client to the nearest replica server based on thei
     To survive crashes, both client and server persist pending/completed RPCs to disk.
 
 - **Exactly-Once** retransmission (At-Least-Once) + deduplication (At-Most-Once) + persistence on both sides for crash recovery. Limitation: not possible with external physical actions.
+
+#### Distributed Storage System
+
+- **The Google File System (GFS)**
+    
+    - **Target environment**
+    
+        - Files are huge, but not many.
+        - Write once, read many.
+        - I/O bandwidth is more important than latency.
+
+        Typical workloads : Bulk Synchronous Processing (BSP).
+    
+    - **Design Decisions**
+        
+        - **Chunk** Use 64MB chunks to amortize seek costs, pushing read throughput close to disk transfer limits for streaming workloads.
+
+        - **Replication** Replicate each chunk three times across racks to balance write performance.
+        
+        - **Single master** Centralize metadata for coordination.
+        
+        - **Record append** Support concurrent appends.
+    
+    - **General Architecture**
+      
+        <img src="pic/10.png" width="60%" height="60%">
+        
+        - **Single master**
+
+            **Shadow masters** provide read-only access with slightly stale metadata by replicating the primary's operation log, ensuring availability during primary failure.
+
+            GFS prevents master **overload** by minimizing its involvement: data never passes through it, large chunks reduce metadata ops, and chunk leases delegate write coordination authority to primary replicas.
+
+            <table>
+            <thead>
+                <tr>
+                <th width="25%">Category</th>
+                <th width="25%">Responsibility</th>
+                <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                <td rowspan="4" style="vertical-align: top;"><strong>Regular Management</strong></td>
+                <td><strong>Metadata Storage</strong></td>
+                <td>Stores namespaces, file-to-chunk mappings, chunk locations in memory.</td>
+                </tr>
+                <tr>
+                <td><strong>Namespace Locking</strong></td>
+                <td>Locks directory operations to handle concurrent accesses.</td>
+                </tr>
+                <tr>
+                <td><strong>Periodic Communication</strong></td>
+                <td>Heartbeats with chunkservers to monitor health and exchange state.</td>
+                </tr>
+                <tr>
+                <td><strong>Chunk Lifecycle</strong></td>
+                <td>Creates chunks (rack-aware); re-replicates when replicas low; rebalances load/space.</td>
+                </tr>
+                <tr>
+                <td rowspan="2" style="vertical-align: top;"><strong>Background Cleanup</strong></td>
+                <td><strong>Garbage Collection</strong></td>
+                <td>Logs deletion, renames files as hidden, lazily reclaims space.</td>
+                </tr>
+                <tr>
+                <td><strong>Stale Replica Deletion</strong></td>
+                <td>Uses version numbers to detect and remove outdated replicas.</td>
+                </tr>
+            </tbody>
+            </table>
+        
+        - **Metadata**
+            
+            - file and chunk namespaces
+            - mappings from files to chunks (unique ID)
+            - locations of each chunk’s replicas (ask for chunkserver)
+
+        - **Chunkserver** Chunkservers store 64MB chunks locally with version numbers and checksums while clients read/write via chunk handle and byte range from master without data caching.
+        - **Client** GFS client sends control requests to master, caches metadata, but transfers data directly to/from chunkservers without caching file data.
