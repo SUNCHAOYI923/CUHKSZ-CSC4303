@@ -1,0 +1,8 @@
+*.pem
+*.key
+.env
+.env.*
+__pycache__/
+.pytest_cache/
+*.pyc
+/raw_data/train.txt

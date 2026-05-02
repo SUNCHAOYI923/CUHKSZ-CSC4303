@@ -1,0 +1,322 @@
+=== Creating Chord Network ===
+Created node 1
+Node 8 joined
+Node 15 joined
+Node 23 joined
+
+Stabilizing ring...
+=========================
+NODE 1 FINGER:
+  - 8 at 127.0.0.1:5002
+  - 8 at 127.0.0.1:5002
+  - 8 at 127.0.0.1:5002
+  - 15 at 127.0.0.1:5003
+  - 23 at 127.0.0.1:5004
+NODE 8 FINGER:
+  - 15 at 127.0.0.1:5003
+  - 15 at 127.0.0.1:5003
+  - 15 at 127.0.0.1:5003
+  - 23 at 127.0.0.1:5004
+  - 1 at 127.0.0.1:5001
+NODE 15 FINGER:
+  - 23 at 127.0.0.1:5004
+  - 23 at 127.0.0.1:5004
+  - 23 at 127.0.0.1:5004
+  - 23 at 127.0.0.1:5004
+  - 1 at 127.0.0.1:5001
+NODE 23 FINGER:
+  - 1 at 127.0.0.1:5001
+  - 1 at 127.0.0.1:5001
+  - 1 at 127.0.0.1:5001
+  - 1 at 127.0.0.1:5001
+  - 8 at 127.0.0.1:5002
+=========================
+
+=== Testing Chord Key Storage and Retrieval ===
+
+Storing key-value pairs in the Chord network:
+Storing key0: value0 from node 15 - Success
+Storing key1: value1 from node 1 - Success
+Storing key2: value2 from node 15 - Success
+Storing key3: value3 from node 15 - Success
+Storing key4: value4 from node 23 - Success
+Storing key5: value5 from node 8 - Success
+Storing key6: value6 from node 8 - Success
+Storing key7: value7 from node 1 - Success
+Storing key8: value8 from node 8 - Success
+Storing key9: value9 from node 1 - Success
+Storing key10: value10 from node 1 - Success
+Storing key11: value11 from node 8 - Success
+Storing key12: value12 from node 1 - Success
+Storing key13: value13 from node 23 - Success
+Storing key14: value14 from node 8 - Success
+Storing key15: value15 from node 8 - Success
+Storing key16: value16 from node 23 - Success
+Storing key17: value17 from node 23 - Success
+Storing key18: value18 from node 15 - Success
+Storing key19: value19 from node 15 - Success
+
+Current key distribution across nodes:
+Node 1 data: {'key3': 'value3', 'key4': 'value4', 'key9': 'value9', 'key13': 'value13', 'key17': 'value17', 'key18': 'value18'}
+Node 8 data: {'key0': 'value0', 'key1': 'value1', 'key8': 'value8', 'key10': 'value10', 'key12': 'value12', 'key14': 'value14', 'key19': 'value19'}
+Node 15 data: {'key2': 'value2'}
+Node 23 data: {'key5': 'value5', 'key6': 'value6', 'key7': 'value7', 'key11': 'value11', 'key15': 'value15', 'key16': 'value16'}
+
+Testing retrieval of all keys from all nodes:
+
+Testing retrieval of key: key0
+  Node 1: Success (got: value0, expected: value0)
+  Node 8: Success (got: value0, expected: value0)
+  Node 15: Success (got: value0, expected: value0)
+  Node 23: Success (got: value0, expected: value0)
+
+Testing retrieval of key: key1
+  Node 1: Success (got: value1, expected: value1)
+  Node 8: Success (got: value1, expected: value1)
+  Node 15: Success (got: value1, expected: value1)
+  Node 23: Success (got: value1, expected: value1)
+
+Testing retrieval of key: key2
+  Node 1: Success (got: value2, expected: value2)
+  Node 8: Success (got: value2, expected: value2)
+  Node 15: Success (got: value2, expected: value2)
+  Node 23: Success (got: value2, expected: value2)
+
+Testing retrieval of key: key3
+  Node 1: Success (got: value3, expected: value3)
+  Node 8: Success (got: value3, expected: value3)
+  Node 15: Success (got: value3, expected: value3)
+  Node 23: Success (got: value3, expected: value3)
+
+Testing retrieval of key: key4
+  Node 1: Success (got: value4, expected: value4)
+  Node 8: Success (got: value4, expected: value4)
+  Node 15: Success (got: value4, expected: value4)
+  Node 23: Success (got: value4, expected: value4)
+
+Testing retrieval of key: key5
+  Node 1: Success (got: value5, expected: value5)
+  Node 8: Success (got: value5, expected: value5)
+  Node 15: Success (got: value5, expected: value5)
+  Node 23: Success (got: value5, expected: value5)
+
+Testing retrieval of key: key6
+  Node 1: Success (got: value6, expected: value6)
+  Node 8: Success (got: value6, expected: value6)
+  Node 15: Success (got: value6, expected: value6)
+  Node 23: Success (got: value6, expected: value6)
+
+Testing retrieval of key: key7
+  Node 1: Success (got: value7, expected: value7)
+  Node 8: Success (got: value7, expected: value7)
+  Node 15: Success (got: value7, expected: value7)
+  Node 23: Success (got: value7, expected: value7)
+
+Testing retrieval of key: key8
+  Node 1: Success (got: value8, expected: value8)
+  Node 8: Success (got: value8, expected: value8)
+  Node 15: Success (got: value8, expected: value8)
+  Node 23: Success (got: value8, expected: value8)
+
+Testing retrieval of key: key9
+  Node 1: Success (got: value9, expected: value9)
+  Node 8: Success (got: value9, expected: value9)
+  Node 15: Success (got: value9, expected: value9)
+  Node 23: Success (got: value9, expected: value9)
+
+Testing retrieval of key: key10
+  Node 1: Success (got: value10, expected: value10)
+  Node 8: Success (got: value10, expected: value10)
+  Node 15: Success (got: value10, expected: value10)
+  Node 23: Success (got: value10, expected: value10)
+
+Testing retrieval of key: key11
+  Node 1: Success (got: value11, expected: value11)
+  Node 8: Success (got: value11, expected: value11)
+  Node 15: Success (got: value11, expected: value11)
+  Node 23: Success (got: value11, expected: value11)
+
+Testing retrieval of key: key12
+  Node 1: Success (got: value12, expected: value12)
+  Node 8: Success (got: value12, expected: value12)
+  Node 15: Success (got: value12, expected: value12)
+  Node 23: Success (got: value12, expected: value12)
+
+Testing retrieval of key: key13
+  Node 1: Success (got: value13, expected: value13)
+  Node 8: Success (got: value13, expected: value13)
+  Node 15: Success (got: value13, expected: value13)
+  Node 23: Success (got: value13, expected: value13)
+
+Testing retrieval of key: key14
+  Node 1: Success (got: value14, expected: value14)
+  Node 8: Success (got: value14, expected: value14)
+  Node 15: Success (got: value14, expected: value14)
+  Node 23: Success (got: value14, expected: value14)
+
+Testing retrieval of key: key15
+  Node 1: Success (got: value15, expected: value15)
+  Node 8: Success (got: value15, expected: value15)
+  Node 15: Success (got: value15, expected: value15)
+  Node 23: Success (got: value15, expected: value15)
+
+Testing retrieval of key: key16
+  Node 1: Success (got: value16, expected: value16)
+  Node 8: Success (got: value16, expected: value16)
+  Node 15: Success (got: value16, expected: value16)
+  Node 23: Success (got: value16, expected: value16)
+
+Testing retrieval of key: key17
+  Node 1: Success (got: value17, expected: value17)
+  Node 8: Success (got: value17, expected: value17)
+  Node 15: Success (got: value17, expected: value17)
+  Node 23: Success (got: value17, expected: value17)
+
+Testing retrieval of key: key18
+  Node 1: Success (got: value18, expected: value18)
+  Node 8: Success (got: value18, expected: value18)
+  Node 15: Success (got: value18, expected: value18)
+  Node 23: Success (got: value18, expected: value18)
+
+Testing retrieval of key: key19
+  Node 1: Success (got: value19, expected: value19)
+  Node 8: Success (got: value19, expected: value19)
+  Node 15: Success (got: value19, expected: value19)
+  Node 23: Success (got: value19, expected: value19)
+
+All retrieval tests: Success
+
+=== Testing Edge Cases ===
+
+Testing non-existent keys:
+Get non-existent key: Success
+
+Testing duplicate keys:
+Duplicate key test (overwrite): Success
+
+=== Testing Key Transfer with New Node ===
+
+Storing initial data:
+Stored transfer_key0: transfer_value0
+Stored transfer_key1: transfer_value1
+Stored transfer_key2: transfer_value2
+Stored transfer_key3: transfer_value3
+Stored transfer_key4: transfer_value4
+Stored transfer_key5: transfer_value5
+Stored transfer_key6: transfer_value6
+Stored transfer_key7: transfer_value7
+Stored transfer_key8: transfer_value8
+Stored transfer_key9: transfer_value9
+
+Initial data distribution:
+Node 1 data: {'key3': 'value3', 'key4': 'value4', 'key9': 'value9', 'key13': 'value13', 'key17': 'value17', 'key18': 'value18', 'duplicate_key': 'value2', 'transfer_key7': 'transfer_value7'}
+Node 8 data: {'key0': 'value0', 'key1': 'value1', 'key8': 'value8', 'key10': 'value10', 'key12': 'value12', 'key14': 'value14', 'key19': 'value19'}
+Node 15 data: {'key2': 'value2', 'transfer_key1': 'transfer_value1', 'transfer_key4': 'transfer_value4', 'transfer_key5': 'transfer_value5', 'transfer_key6': 'transfer_value6', 'transfer_key8': 'transfer_value8', 'transfer_key9': 'transfer_value9'}
+Node 23 data: {'key5': 'value5', 'key6': 'value6', 'key7': 'value7', 'key11': 'value11', 'key15': 'value15', 'key16': 'value16', 'transfer_key0': 'transfer_value0', 'transfer_key2': 'transfer_value2', 'transfer_key3': 'transfer_value3'}
+
+Creating new node 30 and joining via node 15
+Node 30 joined
+
+Stabilizing ring after new node joined...
+
+Data distribution after new node joined:
+Node 1 data: {'key4': 'value4', 'key18': 'value18', 'duplicate_key': 'value2'}
+Node 8 data: {'key0': 'value0', 'key1': 'value1', 'key8': 'value8', 'key10': 'value10', 'key12': 'value12', 'key14': 'value14', 'key19': 'value19'}
+Node 15 data: {'key2': 'value2', 'transfer_key1': 'transfer_value1', 'transfer_key4': 'transfer_value4', 'transfer_key5': 'transfer_value5', 'transfer_key6': 'transfer_value6', 'transfer_key8': 'transfer_value8', 'transfer_key9': 'transfer_value9'}
+Node 23 data: {'key5': 'value5', 'key6': 'value6', 'key7': 'value7', 'key11': 'value11', 'key15': 'value15', 'key16': 'value16', 'transfer_key0': 'transfer_value0', 'transfer_key2': 'transfer_value2', 'transfer_key3': 'transfer_value3'}
+Node 30 data: {'key3': 'value3', 'key9': 'value9', 'key13': 'value13', 'key17': 'value17', 'transfer_key7': 'transfer_value7'}
+
+Verifying all keys are still accessible after transfer:
+Key transfer_key0: Success (got: transfer_value0)
+Key transfer_key1: Success (got: transfer_value1)
+Key transfer_key2: Success (got: transfer_value2)
+Key transfer_key3: Success (got: transfer_value3)
+Key transfer_key4: Success (got: transfer_value4)
+Key transfer_key5: Success (got: transfer_value5)
+Key transfer_key6: Success (got: transfer_value6)
+Key transfer_key7: Success (got: transfer_value7)
+Key transfer_key8: Success (got: transfer_value8)
+Key transfer_key9: Success (got: transfer_value9)
+
+All keys accessible after transfer: Success
+
+=== All tests completed ===
+
+=== Testing Node Failure Recovery ===
+
+Initial finger tables:
+=========================
+NODE 1 FINGER:
+  - 8 at 127.0.0.1:5002
+  - 8 at 127.0.0.1:5002
+  - 8 at 127.0.0.1:5002
+  - 15 at 127.0.0.1:5003
+  - 23 at 127.0.0.1:5004
+NODE 8 FINGER:
+  - 15 at 127.0.0.1:5003
+  - 15 at 127.0.0.1:5003
+  - 15 at 127.0.0.1:5003
+  - 23 at 127.0.0.1:5004
+  - 30 at 127.0.0.1:5010
+NODE 15 FINGER:
+  - 23 at 127.0.0.1:5004
+  - 23 at 127.0.0.1:5004
+  - 23 at 127.0.0.1:5004
+  - 23 at 127.0.0.1:5004
+  - 1 at 127.0.0.1:5001
+NODE 23 FINGER:
+  - 30 at 127.0.0.1:5010
+  - 30 at 127.0.0.1:5010
+  - 30 at 127.0.0.1:5010
+  - 1 at 127.0.0.1:5001
+  - 8 at 127.0.0.1:5002
+NODE 30 FINGER:
+  - 1 at 127.0.0.1:5001
+  - 1 at 127.0.0.1:5001
+  - 8 at 127.0.0.1:5002
+  - 8 at 127.0.0.1:5002
+  - 15 at 127.0.0.1:5003
+=========================
+
+Simulating failure of node 15
+Stopped server for node 15
+
+Running check_predecessor on remaining nodes...
+Node 23 checking failed predecessor 15
+Node 23 predecessor is now None
+
+Stabilizing remaining nodes...
+
+Finger tables after recovery:
+=========================
+NODE 1 FINGER:
+  - 8 at 127.0.0.1:5002
+  - 8 at 127.0.0.1:5002
+  - 8 at 127.0.0.1:5002
+  - 23 at 127.0.0.1:5004
+  - 23 at 127.0.0.1:5004
+NODE 8 FINGER:
+  - 23 at 127.0.0.1:5004
+  - 23 at 127.0.0.1:5004
+  - 23 at 127.0.0.1:5004
+  - 23 at 127.0.0.1:5004
+  - 30 at 127.0.0.1:5010
+NODE 23 FINGER:
+  - 30 at 127.0.0.1:5010
+  - 30 at 127.0.0.1:5010
+  - 30 at 127.0.0.1:5010
+  - 1 at 127.0.0.1:5001
+  - 8 at 127.0.0.1:5002
+NODE 30 FINGER:
+  - 1 at 127.0.0.1:5001
+  - 1 at 127.0.0.1:5001
+  - 8 at 127.0.0.1:5002
+  - 8 at 127.0.0.1:5002
+  - 23 at 127.0.0.1:5004
+=========================
+
+=== Failure recovery success ===
+
+Shutting down all nodes...
+
+Test suite finished

@@ -1,0 +1,16 @@
+# Compiled object files
+*.o
+
+# Python bytecode
+__pycache__/
+
+# Virtual environments
+.venv/
+
+# Build artifacts
+server_app/server
+
+# IDE specific files
+*.idea/
+*.vscode/
+.DS_Store # macOS specific

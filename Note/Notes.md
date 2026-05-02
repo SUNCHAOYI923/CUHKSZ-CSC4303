@@ -2,7 +2,7 @@
 
 ## Reference
 
-- https://book.systemsapproach.org/foundation.html
+- [Reference](https://book.systemsapproach.org/foundation.html)
 
 ## Network Model
 
@@ -16,7 +16,7 @@
 
 ### Transport Layer
 
-#### UDP
+#### User Datagram Protocol (UDP)
 
 - **Connectionless** 
     
@@ -68,7 +68,7 @@
     └─────────────────────────────────────┘
     ```
     
-#### TCP
+#### Transmission Control Protocol (TCP)
 
 - **Header**
 
@@ -147,7 +147,7 @@
 
                 - Old segments won't confuse new connections.
                 
-    - **Flow Control**
+    - **Flow Control** (Receiver processing limitation)
 
         - **Automatic Repeat Query**
             
@@ -197,7 +197,7 @@
                 |$\text{Svar}$ (variability of RTT)|$\text{Svar}_{n + 1} = (1-\beta)\cdot \text{Svar}_n + \beta \cdot \mid \text{RTT}_{n + 1} - \text{SRTT}_{n + 1} \mid$|
                 |$\text{Timeout}$|$\text{Timeout}_n = \text{SRTT}_n + 4 \cdot \text{Svar}_n$|
         
-    - **Congestion Control**
+    - **Congestion Control** (Network capacity limitation)
         TCP congestion control uses a sliding window (cwnd), interprets packet loss as a congestion signal, and adjusts the window via AIMD to achieve an efficient and roughly fair bandwidth allocation.
 
         - **Max-Min fairness**
@@ -228,7 +228,9 @@
 
                 - Hosts multiplicatively decrease rate when congested
 
-        - **TCP Tahoe**
+        - **TCP Tahoe/Reno**
+
+            <img src="pic/16.png" width="60%" height="60%">
 
             - **Slow Start**
                 
@@ -259,6 +261,7 @@
 |Data Size|Unlimited|Limited|
 |Flow Control|Flow control matches sender to receiver|Send regardless of receiver state|
 |Congestion Control|Congestion control matches sender to network|Send regardless of network state|
+|Example|Files, Web pages|Voice, video, DNS|
         
 #### Socket
     
@@ -414,12 +417,14 @@ An endpoint for network communication that allows an application to attach to a 
 
 #### Dynamic Host Configuration Protocol (DHCP) [Application Layer]
 
+Uses UDP ports 67 (server) and 68 (client). 
+
 | Step | Message | IP Header (Src &rarr; Dst) | Ethernet (Src &rarr; Dst) | Purpose |
 |:----:|:--------|:-------------------------------------------|:--------------------------------------------------------|:---------------------------------------|
 | 1 | **DISCOVER** | `0.0.0.0` &rarr; `255.255.255.255` | `Client MAC` &rarr; `FF:FF:FF:FF:FF:FF` | Client broadcasts to find DHCP servers |
-| 2 | **OFFER** | `Server's IP` &rarr; `255.255.255.255` | `Server MAC` &rarr; `FF:FF:FF:FF:FF:FF` | Server proposes IP configuration |
+| 2 | **OFFER** | `Server's IP` &rarr; `255.255.255.255` | `Server MAC` &rarr; `Client MAC`| Server proposes IP configuration |
 | 3 | **REQUEST** | `0.0.0.0` &rarr; `255.255.255.255` | `Client MAC` &rarr; `FF:FF:FF:FF:FF:FF` | Client accepts the offer |
-| 4 | **ACK** | `Server's IP` &rarr; `255.255.255.255` | `Server MAC` &rarr; `FF:FF:FF:FF:FF:FF` | Server confirms and finalizes lease |
+| 4 | **ACK** | `Server's IP` &rarr; `255.255.255.255` | `Server MAC` &rarr; ` Client MAC` | Server confirms and finalizes lease |
 
 #### Address Resolution Protocol (ARP)
 
@@ -474,7 +479,7 @@ NAT maps multiple private IP:port pairs to a single public IP with unique extern
         - **Static Routing**
         - **Dynamic Routing** RIP (Routing Information Protocol), OSPF (Open Shortest Path First), BGP (Border Gateway Protocol).
 
-    - **IP Prefix Aggregation and Subnets**
+    - **IP Prefix Aggregation and Subnets** (Longest prefix matching)
 
         Routers can change prefix lengths without affecting hosts.
 
@@ -756,3 +761,99 @@ A CDN uses DNS to direct each client to the nearest replica server based on thei
 
         - **Chunkserver** Chunkservers store 64MB chunks locally with version numbers and checksums while clients read/write via chunk handle and byte range from master without data caching.
         - **Client** GFS client sends control requests to master, caches metadata, but transfers data directly to/from chunkservers without caching file data.
+
+    - **File read and write**
+
+        - **Read** Client asks master for chunk locations, then reads data directly from the nearest chunkserver and returns it to the application (choose one to read).
+        - **Write** Client gets locations, pushes data to all replicas' buffers, then primary serializes writes and coordinates secondaries before acknowledging (write all primary and secondaries).
+
+    - **Fault Tolerance**
+
+        GFS uses heartbeats to detect failures, reduces replica counts, and re-replicates chunks elsewhere to restore full replication.
+
+
+#### GFS/HDFS vs. Dynamo
+
+| Aspect | GFS / HDFS | Dynamo |
+|:--|:--|:--|
+| Interface | File system | Key-value store |
+| Assumptions | Large files, write-once (sequential) read-many | Small object storage, random write & read |
+| Primary Targets | Batch processing, high throughput, fault tolerance at scale | Transactional workloads, data availability & low latency response, conflict resolution |
+| Design Choices | Master-worker architecture, cross-rack replication, relaxed consistency | Peer-to-peer architecture, consistent hashing, eventual consistency |
+
+#### Time in Distributed Systems
+
+- **Cristian Algorithm**
+
+    <img src="pic/11.png" width="60%" height="60%">
+
+    $T_{client} = T_{server} + \frac{T_1 - T_0}{2}$
+
+- **The Lamport Clock Algorithm**
+
+    Lamport clocks ignore physical time and only capture the happens-before relationship between events.
+
+    Each process $P_i$ maintains a local clock $C_i$. For a local event, $C_i \leftarrow C_i + 1$, then $C_{event} = C_i$. When process $P_i$ sending an message $k$, set $C_k = C_i$. When process $P_j$ receives an message $k$, $C_j \leftarrow \max (c_j,c_k) + 1$.
+
+    If $a \to b$, then $T_a < T_b$. However, the converse does not hold — Lamport timestamps alone cannot be used to infer causal relationships between events.
+
+- **Totally-Ordered Multicast**
+
+    Totally-ordered multicast ensures identical processing order. Replicas sort queues by timestamps (dynamically updating the head), broadcast ACKs strictly for this **head**, and execute it once globally acknowledged.
+
+- **Vector clock**
+
+    Initially all vectors are $[0,0,\cdots,0]$.
+
+    For each local event on process $i$, increment local entry $c_i$.
+
+    If process $j$ receives message with vector $[d_1,d_2,\cdots, d_n]$, then $c_k = \max (c_k,d_k)$, and increment local entry $c_j$.
+
+|Comparison|Lamport Clock|Vector Clock|
+|:--:|:--:|:--:|
+|Given|$C(a) < C(z)$|$V(a) < V(z)$|
+|Conclusion|Either $a \to z$ or $a \parallel z$|$a \to z$|
+|Precision|Cannot distinguish causality from concurrency|Precisely captures happens-before relation|
+
+#### Parallelism Basics and Collective Communication
+
+- **Communication patterns**
+    - Point-to-point communication
+    - Collective communication
+
+- **Model**
+
+    - **Cost of Communication** $\alpha + n \beta$ (or $\alpha + Mn \beta$ if a message encounters a link that simulaneously accommodates $M$ messages) ($\alpha$ Latency, $\beta$ Transfer time per byte, $n$ Message size in bytes, $\gamma$ Computation time per byte for reduction operations)
+    - **Primitive**
+        | Primitive | Pattern | Description |
+        |-----------|---------|-------------|
+        | Broadcast | One-to-all | One process sends the same data to all processes |
+        | Reduce(-to-one) | All-to-one | All processes perform a reduction operation (sum, max, etc.) and send the result to one process |
+        | Scatter | One-to-all | One process distributes distinct data chunks to all processes |
+        | Gather | All-to-one | All processes send their data to a single process |
+        | Allgather | All-to-all | All processes collect data from all processes (each process gets the full data set) |
+        | Reduce-scatter | All-to-all | Perform local reduction first, then scatter results (first half of Allreduce) |
+        | Allreduce | All-to-all | All processes perform a reduction operation, and the result is distributed to all processes |
+    
+- **Minimum Spanning Tree Algorithm** (emphasize low latency for small message)
+
+    Recursive halving broadcast splits nodes in half sends to opposite half recurses achieving $\log N$ rounds optimizing latency for small messages. 
+    
+    <img src="pic/12.png" width="50%" height="50%">
+
+    Totoal cost:
+    - **Broadcast** $\lceil \log p \rceil (\alpha + n \beta)$
+    - **Reduce** $\lceil \log p \rceil (\alpha + n \beta + n \gamma)$ Compute overhead is required for reduce.
+    - **scatter/Gather** $\sum \limits_{k = 1}^{\log p} \alpha + \frac{n}{2^k}\beta = \alpha \log p + \frac{p - 1}{p}n \beta$
+
+    <img src="pic/13.png" width="50%" height="50%">
+
+- **Ring Algorithm** (emphasize bandwidth utilization for large message)
+
+    The bandwidth term $n \beta$ now dominates.
+    
+    <img src="pic/14.png" width="50%" height="50%">
+
+    Ring algorithm can not be better for Scatter and Gather.
+    
+    <img src="pic/15.png" width="50%" height="50%">
