@@ -697,11 +697,11 @@ A CDN uses DNS to direct each client to the nearest replica server based on thei
     
     - **Design Decisions**
         
-        - **Chunk** Use 64MB chunks to amortize seek costs, pushing read throughput close to disk transfer limits for streaming workloads.
+        - **Chunk** Use 64MB chunks amortize seek costs, approach disk transfer limits for streaming workloads, and reduce both metadata overhead on the master and RPC overhead for large reads/writes.
 
-        - **Replication** Replicate each chunk three times across racks to balance write performance.
+        - **Replication** Replicate each chunk three times across racks, with one replica in the same rack for low write latency and two or more in other racks for fault tolerance against rack-level failures, trading off cross-rack bandwidth.
         
-        - **Single master** Centralize metadata for coordination.
+        - **Single master** Centralize metadata only to avoid making the master a bottleneck, while keeping data transfer peer-to-peer between clients and chunkservers to maximize throughput and scalability.
         
         - **Record append** Support concurrent appends.
     
@@ -844,7 +844,7 @@ A CDN uses DNS to direct each client to the nearest replica server based on thei
     Totoal cost:
     - **Broadcast** $\lceil \log p \rceil (\alpha + n \beta)$
     - **Reduce** $\lceil \log p \rceil (\alpha + n \beta + n \gamma)$ Compute overhead is required for reduce.
-    - **scatter/Gather** $\sum \limits_{k = 1}^{\log p} \alpha + \frac{n}{2^k}\beta = \alpha \log p + \frac{p - 1}{p}n \beta$
+    - **Scatter/Gather** $\sum \limits_{k = 1}^{\lceil \log p \rceil} \alpha + \frac{n}{2^k}\beta = \alpha \lceil \log p \rceil + \frac{p - 1}{p}n \beta$
 
     <img src="pic/13.png" width="50%" height="50%">
 
@@ -857,3 +857,13 @@ A CDN uses DNS to direct each client to the nearest replica server based on thei
     Ring algorithm can not be better for Scatter and Gather.
     
     <img src="pic/15.png" width="50%" height="50%">
+
+### LLM
+
+#### Parallelism in Distributed Machine Learning
+
+<img src="pic/17.png" width="50%" height="50%">
+
+#### Continuous batching
+
+<img src="pic/18.png" width="50%" height="50%">
